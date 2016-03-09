@@ -72,6 +72,22 @@ The list of options and what they mean is below. All the options can stack with 
     node main.js --debug
     ```
 
+    ### invert
+
+    Inverting gives you the "answers" as the "hints", aka the opposite of normal order is used from the dictionary. You can also invert at random if you like variety. 
+
+    To invert everything in the quiz:
+
+    ```
+    node main.js --invert
+    ```
+
+    To invert at random...
+
+    ```
+    node main.js --invert=random
+    ```
+
 
 
 
