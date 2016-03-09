@@ -92,15 +92,26 @@ prompt.start()
 
 # set to the index in the array which will be shown as the "question"
 # the other index will be used as the answer
-hint_idx = 0
-answer_idx = 1
 default_max_words = 999
 shuffle_words = process_args.has_flag "--shuffle"
+invert_hints = false
+randomly_invert_hints = false
 max_words = if process_args.has_flag("--num_words") then parseInt(process_args.val("--num_words")) else default_max_words
 words = if shuffle_words then _.shuffle(dictionary_data) else dictionary_data
 prompts = []
 
-_debug("shuffle enabled") if shuffle_words
+if process_args.has_flag("--invert")
+  if process_args.val("--invert") == "random"
+    randomly_invert_hints = true
+  else
+    invert_hints = true
+
+hint_idx = if invert_hints then 1 else 0
+answer_idx = if invert_hints then 0 else 1
+
+_debug("shuffle is #{if shuffle_words then 'enabled' else ''}")
+_debug("invert_hints is #{if invert_hints then 'enabled' else 'disabled'}")
+_debug("randomly_invert_hints is #{if randomly_invert_hints then 'enabled' else 'disabled'}")
 
 if max_words < words.length
   words = _.first words, max_words
@@ -109,9 +120,14 @@ else
   console.log "#{words.length} words loaded! This is the entire dictionary."
 
 for word, i in words
+  invert_at_random = if randomly_invert_hints
+    (Math.floor(Math.random() * 100)) % 2 == 0
+  else
+    false
+
   theprompt =
-    name: "word_#{i}"
-    description: word[hint_idx]
+    name: "#{if invert_at_random then '-' else ''}word_#{i}"
+    description: if invert_at_random then word[answer_idx] else word[hint_idx]
 
   prompts.push theprompt
 
@@ -124,8 +140,9 @@ score_results = (results) ->
   for key, guess of results
     idx = parseInt key.substr(key.indexOf("_") + 1)
     source = words[idx]
+    inverted = key.charAt(0) == "-"
 
-    if guess == source[answer_idx]
+    if (inverted && guess == source[hint_idx]) || (!inverted && guess == source[answer_idx])
       correct++
     else
       wrong++
