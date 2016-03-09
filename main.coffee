@@ -67,7 +67,10 @@ _debug = (msg) ->
   return unless DEBUG_MODE
   console.log colors.yellow msg
 
-dictionary_file = if process_args.has_val("--dictionary") then process_args.val("--dictionary") else "dictionary.csv"
+dictionary_file = if process_args.has_val("--dictionary")
+  "dictionaries/#{process_args.val('--dictionary')}.csv"
+else
+  "dictionary.csv"
 
 _debug "selected dictionary: #{dictionary_file}"
 

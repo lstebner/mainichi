@@ -106,7 +106,7 @@
     return console.log(colors.yellow(msg));
   };
 
-  dictionary_file = process_args.has_val("--dictionary") ? process_args.val("--dictionary") : "dictionary.csv";
+  dictionary_file = process_args.has_val("--dictionary") ? "dictionaries/" + (process_args.val('--dictionary')) + ".csv" : "dictionary.csv";
 
   _debug("selected dictionary: " + dictionary_file);
 
