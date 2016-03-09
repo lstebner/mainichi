@@ -88,6 +88,14 @@ The list of options and what they mean is below. All the options can stack with 
     node main.js --invert=random
     ```
 
+    ### timed
+
+    To time your test, pass the `timed` flag. It let's you know when you are done how long you took to complete the quiz. 
+
+    ```
+    node main.js --timed
+    ```
+
 
 
 

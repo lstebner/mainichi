@@ -60,6 +60,8 @@ class NodeArgs
   data: -> @args
 
 process_args = new NodeArgs()
+process_start_time = (new Date).getTime()
+process_end_time = 0
 
 DEBUG_MODE = process_args.has_flag("--debug")
 
@@ -94,6 +96,7 @@ prompt.start()
 # the other index will be used as the answer
 default_max_words = 999
 shuffle_words = process_args.has_flag "--shuffle"
+timed = process_args.has_flag "--timed"
 invert_hints = false
 randomly_invert_hints = false
 max_words = if process_args.has_flag("--num_words") then parseInt(process_args.val("--num_words")) else default_max_words
@@ -112,6 +115,7 @@ answer_idx = if invert_hints then 0 else 1
 _debug("shuffle is #{if shuffle_words then 'enabled' else ''}")
 _debug("invert_hints is #{if invert_hints then 'enabled' else 'disabled'}")
 _debug("randomly_invert_hints is #{if randomly_invert_hints then 'enabled' else 'disabled'}")
+_debug("timed is #{if timed then 'enabled' else ''}")
 
 if max_words < words.length
   words = _.first words, max_words
@@ -158,13 +162,37 @@ score_results = (results) ->
 
   [score, correct, wrong, wrong_words]
 
+process_setup_time = (new Date).getTime() - process_start_time
+
+if process_setup_time < 1000
+  process_setup_time = "<1"
+else
+  process_setup_time = process_setup_time / 1000
+  
+_debug("setup completed in #{process_setup_time} seconds")
+
+prompt_start_time = (new Date).getTime()
+prompt_end_time = 0
+
 prompt.get prompts, (err, result) ->
   [score, correct, wrong, wrong_words] = score_results result
 
-  console.log colors.green "You finished with a score of #{score * 100}%"
+  prompt_end_time = (new Date).getTime()
+  prompt_completion_time = (prompt_end_time - prompt_start_time) / 1000
+
+  finished_msg = "You finished with a score of #{score * 100}%"
+
+  if timed
+    finished_msg += " in a time of #{prompt_completion_time} seconds"
+
+  console.log colors.green finished_msg
 
   if wrong
     console.log colors.red "Looks like you need some more practice with the following words:"
 
     for word, i in wrong_words
       console.log colors.red "#{i+1}. #{word[hint_idx]} - #{word[answer_idx]}"
+
+  process_end_time = (new Date).getTime()
+  process_completion_time = (process_end_time - process_start_time) / 1000
+  _debug("process completed in #{process_completion_time} seconds")
