@@ -2,6 +2,16 @@
 
 What is this? Well, it's basically a deck of flashcards in the form of a console application. You run it, it asks you to translate a series of terms and then you get a grade! You could theoretically use it to test you in other departments, but I haven't gotten there quite yet.
 
+## Installation
+
+The first time you get this repo you need to run an installation. If you have node and npm ready to go, it's easy, just `cd` into the same directory this readme is in and run
+
+```
+npm install
+```
+
+If all goes well, you're set. If there are errors, fix them (nothing should go wrong).
+
 ## Dictionaries
 
 This applications relies highly on the usage of "dictionaries". These are CSV files which contain a list of words and their translation seperated by a comma. These may contain more information in the future, but for now that is it.
