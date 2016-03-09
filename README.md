@@ -10,7 +10,17 @@ The first time you get this repo you need to run an installation. If you have no
 npm install
 ```
 
-If all goes well, you're set. If there are errors, fix them (nothing should go wrong).
+If all goes well, you're set. If there are errors, fix them (nothing should go wrong). Next, do the compile step below.
+
+## Compiling
+
+The code ships with a main entry point of `quiz.coffee` but you need to compile it into a regular javascript file. If you don't have coffeescript installed, `npm install coffee` and then run the following command.
+
+```
+coffee -c quiz.coffee
+```
+
+Now you're really, really, ready to run the app!
 
 ## Dictionaries
 
@@ -25,7 +35,7 @@ You can create any number of dictionaries you want, just add them to the "dictio
 Running the quiz is easy, with node installed you just run this command:
 
 ```
-node main.js
+node quiz.js
 ```
 
 That's the vanilla version, which will run through all the words in 'dictionary.csv', in order. It prompts with the first index and wants the second index (the word after the comma) as answer. You'll likely want to configure this in various ways, so read below for configuration options.
@@ -35,7 +45,7 @@ That's the vanilla version, which will run through all the words in 'dictionary.
 When starting up the quiz there are many configuration options that can be passed. Passing them looks something like this:
 
 ```
-node main.js --num_words=10 --shuffle
+node quiz.js --num_words=10 --shuffle
 ```
 
 The list of options and what they mean is below. All the options can stack with each other (unless otherwise noted) as seen in the example above.
@@ -45,7 +55,7 @@ The list of options and what they mean is below. All the options can stack with 
     The default dictionary is `dictionary.csv` but you can also add dictionary files to the "dictionaries" folder and use them instead. To use one of these dictionaries, pass the name as a flag:
 
     ```
-    node main.js --dictionary=japanese
+    node quiz.js --dictionary=japanese
     ```
 
     ### shuffle
@@ -53,7 +63,7 @@ The list of options and what they mean is below. All the options can stack with 
     Since you'll probably get tired of the order of a dictionary quickly, the shuffle flag exists to switch things up. It doesn't need a value.
 
     ```
-    node main.js --shuffle
+    node quiz.js --shuffle
     ```
 
     ### num_words
@@ -61,7 +71,7 @@ The list of options and what they mean is below. All the options can stack with 
     Similar to why shuffle exists, but also because a dictionary can be pretty big; you may only want to use a subset of a dictionary in your quiz. The subset is random, but by passing num_words you can specify how many words to use. 
 
     ```
-    node main.js --num_words=10
+    node quiz.js --num_words=10
     ```
 
     ### debug
@@ -69,7 +79,7 @@ The list of options and what they mean is below. All the options can stack with 
     Debug mode is mainly for myself, bug I will document it since it exists. It's a flag just like shuffle that outputs some extra information.
 
     ```
-    node main.js --debug
+    node quiz.js --debug
     ```
 
     ### invert
@@ -79,13 +89,13 @@ The list of options and what they mean is below. All the options can stack with 
     To invert everything in the quiz:
 
     ```
-    node main.js --invert
+    node quiz.js --invert
     ```
 
     To invert at random...
 
     ```
-    node main.js --invert=random
+    node quiz.js --invert=random
     ```
 
     ### timed
@@ -93,7 +103,7 @@ The list of options and what they mean is below. All the options can stack with 
     To time your test, pass the `timed` flag. It let's you know when you are done how long you took to complete the quiz. 
 
     ```
-    node main.js --timed
+    node quiz.js --timed
     ```
 
 
