@@ -97,6 +97,17 @@ prompt.start()
 default_max_words = 999
 shuffle_words = process_args.has_flag "--shuffle"
 timed = process_args.has_flag "--timed"
+quiz_modes = ["qa", "echo"]
+default_quiz_mode = "qa"
+quiz_mode = if process_args.has_flag("--mode") 
+  process_args.val("--mode")
+else
+  default_quiz_mode
+
+if _.indexOf(quiz_modes, quiz_mode) < 0
+  console.log colors.red "invalid quiz mode selected '#{quiz_mode}'; using default"
+  quiz_mode = default_quiz_mode
+
 invert_hints = false
 randomly_invert_hints = false
 max_words = if process_args.has_flag("--num_words") then parseInt(process_args.val("--num_words")) else default_max_words
@@ -112,6 +123,7 @@ if process_args.has_flag("--invert")
 hint_idx = if invert_hints then 1 else 0
 answer_idx = if invert_hints then 0 else 1
 
+_debug("quiz mode is #{quiz_mode}")
 _debug("shuffle is #{if shuffle_words then 'enabled' else ''}")
 _debug("invert_hints is #{if invert_hints then 'enabled' else 'disabled'}")
 _debug("randomly_invert_hints is #{if randomly_invert_hints then 'enabled' else 'disabled'}")
@@ -146,11 +158,20 @@ score_results = (results) ->
     source = words[idx]
     inverted = key.charAt(0) == "-"
 
-    if (inverted && guess == source[hint_idx]) || (!inverted && guess == source[answer_idx])
-      correct++
-    else
-      wrong++
-      wrong_indexes.push idx
+    switch quiz_mode
+      when "qa"
+        if (inverted && guess == source[hint_idx]) || (!inverted && guess == source[answer_idx])
+          correct++
+        else
+          wrong++
+          wrong_indexes.push idx
+
+      when "echo"
+        if guess == source[hint_idx]
+          correct++
+        else
+          wrong++
+          wrong_indexes.push idx
 
   score = if correct == 0 then 0 else correct / (wrong + correct)
 
@@ -191,7 +212,9 @@ prompt.get prompts, (err, result) ->
     console.log colors.red "Looks like you need some more practice with the following words:"
 
     for word, i in wrong_words
-      console.log colors.red "#{i+1}. #{word[hint_idx]} - #{word[answer_idx]}"
+      switch quiz_mode
+        when "qa" then console.log colors.red "#{i+1}. #{word[hint_idx]} - #{word[answer_idx]}"
+        when "echo" then console.log colors.red "#{i+1}. #{word[hint_idx]}"
 
   process_end_time = (new Date).getTime()
   process_completion_time = (process_end_time - process_start_time) / 1000
