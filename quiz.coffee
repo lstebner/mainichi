@@ -69,35 +69,12 @@ _debug = (msg) ->
   return unless DEBUG_MODE
   console.log colors.yellow msg
 
-dictionary_file = if process_args.has_val("--dictionary")
-  "dictionaries/#{process_args.val('--dictionary')}.csv"
-else
-  "dictionary.csv"
-
-_debug "selected dictionary: #{dictionary_file}"
-
-dictionary_data_raw = fs.readFileSync "#{__dirname}/#{dictionary_file}", "UTF-8"
-dictionary_data = for line in dictionary_data_raw.split("\n")
-  if !_.isEmpty line
-    _str.trim(word) for word in line.split(",")
-  else
-    null
-
-dictionary_data = _.reject dictionary_data, (w) => w == null || w == undefined
-
-_debug "loaded #{dictionary_data.length} total words"
-
 prompt.message = ">>>"
 prompt.delimiter = " "
 
 prompt.start()
 
-# set to the index in the array which will be shown as the "question"
-# the other index will be used as the answer
-default_max_words = 999
-shuffle_words = process_args.has_flag "--shuffle"
-timed = process_args.has_flag "--timed"
-quiz_modes = ["qa", "echo"]
+quiz_modes = ["qa", "echo", "math"]
 default_quiz_mode = "qa"
 quiz_mode = if process_args.has_flag("--mode") 
   process_args.val("--mode")
@@ -107,6 +84,48 @@ else
 if _.indexOf(quiz_modes, quiz_mode) < 0
   console.log colors.red "invalid quiz mode selected '#{quiz_mode}'; using default"
   quiz_mode = default_quiz_mode
+
+if quiz_mode == "math"
+  # at the end of setting up the math questions flip the mode back
+  # to 'qa' for the interal testing
+  # quiz_mode = "qa"
+  how_many = 500 
+  max_num = 19
+  operators = ["+", "-"]
+
+  # generate some math problems
+  dictionary_data = for i in [0..how_many]
+    operator = operators[Math.floor Math.random() * operators.length]
+    num1 = Math.ceil Math.random() * max_num
+    num2 = Math.ceil Math.random() * max_num
+    problem = "#{num1} #{operator} #{num2}"
+    answer = eval(problem)
+    [problem, answer]
+
+else
+  dictionary_file = if process_args.has_val("--dictionary")
+    "dictionaries/#{process_args.val('--dictionary')}.csv"
+  else
+    "dictionary.csv"
+
+  _debug "selected dictionary: #{dictionary_file}"
+
+  dictionary_data_raw = fs.readFileSync "#{__dirname}/#{dictionary_file}", "UTF-8"
+  dictionary_data = for line in dictionary_data_raw.split("\n")
+    if !_.isEmpty line
+      _str.trim(word) for word in line.split(",")
+    else
+      null
+
+  dictionary_data = _.reject dictionary_data, (w) => w == null || w == undefined
+
+  _debug "loaded #{dictionary_data.length} total words"
+
+# set to the index in the array which will be shown as the "question"
+# the other index will be used as the answer
+default_max_words = 999
+shuffle_words = process_args.has_flag "--shuffle"
+timed = process_args.has_flag "--timed"
 
 invert_hints = false
 randomly_invert_hints = false
@@ -173,6 +192,13 @@ score_results = (results) ->
           wrong++
           wrong_indexes.push idx
 
+      when "math"
+        if parseInt(guess) == source[answer_idx]
+          correct++
+        else
+          wrong++
+          wrong_indexes.push idx
+
   score = if correct == 0 then 0 else correct / (wrong + correct)
 
   wrong_words = []
@@ -209,12 +235,13 @@ prompt.get prompts, (err, result) ->
   console.log colors.green finished_msg
 
   if wrong
-    console.log colors.red "Looks like you need some more practice with the following words:"
+    console.log colors.red "Looks like you need some more practice with the following:"
 
     for word, i in wrong_words
       switch quiz_mode
         when "qa" then console.log colors.red "#{i+1}. #{word[hint_idx]} - #{word[answer_idx]}"
         when "echo" then console.log colors.red "#{i+1}. #{word[hint_idx]}"
+        when "math" then console.log colors.red "#{i+1}. #{word[hint_idx]} = #{word[answer_idx]}"
 
   process_end_time = (new Date).getTime()
   process_completion_time = (process_end_time - process_start_time) / 1000
