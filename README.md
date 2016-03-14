@@ -80,7 +80,7 @@ The list of options and what they mean is below. All the options can stack with 
 
     The second mode that exists is called "echo". In this mode, the user is meant to echo the words that are shown as the prompt. Some of the dictionaries intended for this mode are actually intended to be typing warmups so they just contain words or even sentences. You could also use the 'qa' dictionaries and even the 'invert' flag to practice words from there. 
 
-    More modes coming soon!
+    The third mode is "math". For this mode a list of basic math problems are generated and then served just like words are served in the other mode. You'll be graded on how correctly you answer the math problems. This currently flips at random between addition and subtraction mode with small numbers, but I will add more configuration options in the future to control this. 
 
     ```
     node quiz.js --mode=echo --dictionary=english-homophones
