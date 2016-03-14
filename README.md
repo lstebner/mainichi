@@ -74,6 +74,18 @@ The list of options and what they mean is below. All the options can stack with 
     node quiz.js --num_words=10
     ```
 
+    ### mode
+
+    Quiz mode is a feature which alters the type of quiz you want to take. The default mode is called "qa" which stands for "Question and Answer". In this form, the quiz is formatted to prompt with a "question" and expects the user to input the "answer". This is the mode the "invert" option most applies to in the sense that it flips which value is used for the prompts.
+
+    The second mode that exists is called "echo". In this mode, the user is meant to echo the words that are shown as the prompt. Some of the dictionaries intended for this mode are actually intended to be typing warmups so they just contain words or even sentences. You could also use the 'qa' dictionaries and even the 'invert' flag to practice words from there. 
+
+    More modes coming soon!
+
+    ```
+    node quiz.js --mode=echo --dictionary=english-homophones
+    ```
+
     ### debug
 
     Debug mode is mainly for myself, bug I will document it since it exists. It's a flag just like shuffle that outputs some extra information.
