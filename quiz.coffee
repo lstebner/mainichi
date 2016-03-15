@@ -3,61 +3,7 @@ colors = require("colors")
 _ = require("underscore")
 _str = require("underscore.string")
 fs = require("fs")
-
-class NodeArgs
-  constructor: ->
-    @args = {}
-    @flags = []
-    @keys = []
-
-    for arg in process.argv
-      if arg.indexOf("=") > -1
-        sp = arg.split("=")
-        @args[sp[0]] = sp[1]
-        @keys.push sp[0]
-      else
-        @args[arg] = 1
-        @flags.push arg
-
-  on: (flag_or_key, fn=null) ->
-    found_flag = @flags.indexOf(flag_or_key) > -1
-    found_key = @keys.indexOf(flag_or_key) > -1
-
-    if found_flag
-      fn?()
-    else if found_key
-      fn?(@args[flag_or_key])
-
-  has_flag: (flag, strict=false) ->
-    found_flag = flag
-
-    if typeof flag == "object"
-      for f in flag
-        if !has_flag
-          has_flag = @args.hasOwnProperty(f)
-
-          if has_flag
-            found_flag = f
-
-    else
-      has_flag = @args.hasOwnProperty(flag)
-
-    return has_flag if !has_flag || (has_flag && !strict)
-    @args[found_flag] == 1
-
-  has_val: (key) ->
-    @has_flag key
-
-  val: (key) ->
-    return if @args.hasOwnProperty(key)
-      @args[key]
-    else
-      false
-
-  arg_equals: (key, val) ->
-    @val(key) == val
-
-  data: -> @args
+NodeArgs = require("./nodeargs")
 
 process_args = new NodeArgs()
 process_start_time = (new Date).getTime()
