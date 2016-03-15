@@ -23,8 +23,13 @@ class Generator
   generate: ->
     console.log "generator generate not yet implemented"
 
-  write_file: (filename) ->
+  write_file: ->
+    filename = @filename_prefix
+    unless no_safety
+      filename += "_#{(new Date).getTime()}"
+
     fs.writeFile "#{__dirname}/dictionaries/#{filename}.csv", @data.join("\n")
+    _debug "wrote file #{filename}"
 
 
 class BasicMathGenerator extends Generator
@@ -54,7 +59,7 @@ class BasicMathGenerator extends Generator
 
     _debug "selected level: #{level}"
 
-    dictionary_data = for i in [0..how_many]
+    @data = for i in [0..how_many]
       operator = operators[Math.floor Math.random() * operators.length]
       num1 = Math.ceil Math.random() * max_num
       num2 = Math.ceil Math.random() * max_num
@@ -64,13 +69,25 @@ class BasicMathGenerator extends Generator
 
     _debug "generated #{how_many} '#{level_nice}' basic math problems"
 
-    @data = dictionary_data
-    filename = "basic_math_#{level_nice}"
-    unless no_safety
-      filename += "_#{(new Date).getTime()}"
-      
-    @write_file filename
-    _debug "wrote file #{filename}"
+    @filename_prefix = "basic_math_#{level_nice}"
+    @write_file()
+
+
+class TimesTableGenerator extends Generator
+  generate: ->
+    _debug "generating..."
+
+    @data = []
+
+    for num1 in [1..12]
+      for num2 in [1..12]
+        problem = "#{num1} * #{num2}"
+        answer = eval problem
+        @data.push [problem, answer] 
+
+    @filename_prefix = "times_tables"
+    @write_file()
+
 
 
 generator = null
@@ -79,3 +96,4 @@ _debug "generator starting for #{process_args.val('--dictionary')}"
 
 switch process_args.val "--dictionary"
   when "basic_math" then generator = new BasicMathGenerator()
+  when "times_tables" then generator = new TimesTableGenerator()
