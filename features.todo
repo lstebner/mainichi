@@ -1,5 +1,7 @@
  ☐ WRITE TESTS!
- ☐ refactor main file 
+ ☐ refactor main file into nice classes
+ ☐ create a config object and ability to load predefined configs
+   this would use a config.json file which use keys to associate commandline flags
 
  ✔ take option to "invert" quiz @done (16-03-08 20:17)
      this feature would use the "definition" for the prompt
