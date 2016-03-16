@@ -31,41 +31,23 @@ if _.indexOf(quiz_modes, quiz_mode) < 0
   console.log colors.red "invalid quiz mode selected '#{quiz_mode}'; using default"
   quiz_mode = default_quiz_mode
 
-if quiz_mode == "math"
-  # at the end of setting up the math questions flip the mode back
-  # to 'qa' for the interal testing
-  # quiz_mode = "qa"
-  how_many = 500 
-  max_num = 19
-  operators = ["+", "-"]
-
-  # generate some math problems
-  dictionary_data = for i in [0..how_many]
-    operator = operators[Math.floor Math.random() * operators.length]
-    num1 = Math.ceil Math.random() * max_num
-    num2 = Math.ceil Math.random() * max_num
-    problem = "#{num1} #{operator} #{num2}"
-    answer = eval(problem)
-    [problem, answer]
-
+dictionary_file = if process_args.has_val("--dictionary")
+  "dictionaries/#{process_args.val('--dictionary')}.csv"
 else
-  dictionary_file = if process_args.has_val("--dictionary")
-    "dictionaries/#{process_args.val('--dictionary')}.csv"
+  "dictionary.csv"
+
+_debug "selected dictionary: #{dictionary_file}"
+
+dictionary_data_raw = fs.readFileSync "#{__dirname}/#{dictionary_file}", "UTF-8"
+dictionary_data = for line in dictionary_data_raw.split("\n")
+  if !_.isEmpty line
+    _str.trim(word) for word in line.split(",")
   else
-    "dictionary.csv"
+    null
 
-  _debug "selected dictionary: #{dictionary_file}"
+dictionary_data = _.reject dictionary_data, (w) => w == null || w == undefined
 
-  dictionary_data_raw = fs.readFileSync "#{__dirname}/#{dictionary_file}", "UTF-8"
-  dictionary_data = for line in dictionary_data_raw.split("\n")
-    if !_.isEmpty line
-      _str.trim(word) for word in line.split(",")
-    else
-      null
-
-  dictionary_data = _.reject dictionary_data, (w) => w == null || w == undefined
-
-  _debug "loaded #{dictionary_data.length} total words"
+_debug "loaded #{dictionary_data.length} total words"
 
 # set to the index in the array which will be shown as the "question"
 # the other index will be used as the answer
@@ -110,6 +92,8 @@ for word, i in words
     name: "#{if invert_at_random then '-' else ''}word_#{i}"
     description: if invert_at_random then word[answer_idx] else word[hint_idx]
 
+  theprompt.description = theprompt.description.magenta
+
   prompts.push theprompt
 
 score_results = (results) ->
@@ -139,7 +123,7 @@ score_results = (results) ->
           wrong_indexes.push idx
 
       when "math"
-        if parseInt(guess) == source[answer_idx]
+        if parseInt(guess) == parseInt(source[answer_idx])
           correct++
         else
           wrong++
